@@ -13,6 +13,7 @@ import {
     LogLevelResponse,
     ManualControlInteraction,
     ManualControlProperties,
+    ManualVectorControlInteraction,
     MapSegmentationActionRequestParameters,
     MapSegmentationProperties,
     MapSegmentEditJoinRequestParameters,
@@ -56,7 +57,7 @@ import {
     ZoneProperties,
 } from "./types";
 import { floorObject } from "./utils";
-import {preprocessMap} from "./mapUtils";
+import { preprocessMap } from "./mapUtils";
 import ReconnectingEventSource from "reconnecting-eventsource";
 
 export const valetudoAPI = axios.create({
@@ -373,8 +374,8 @@ export const fetchValetudoInformation = async (): Promise<ValetudoInformation> =
 
 export const sendDismissWelcomeDialogAction = async (): Promise<void> => {
     await valetudoAPI
-        .put("/valetudo/action", {"action": "dismissWelcomeDialog"})
-        .then(({ status }) => {
+        .put("/valetudo/action", { "action": "dismissWelcomeDialog" })
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not dismiss welcome dialog");
             }
@@ -392,7 +393,7 @@ export const fetchValetudoVersionInformation = async (): Promise<ValetudoVersion
 export const fetchValetudoLog = async (): Promise<string> => {
     return valetudoAPI
         .get<string>("/valetudo/log/content")
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -413,7 +414,7 @@ export const subscribeToLogMessages = (
 export const fetchValetudoLogLevel = async (): Promise<LogLevelResponse> => {
     return valetudoAPI
         .get<LogLevelResponse>("/valetudo/log/level")
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -421,7 +422,7 @@ export const fetchValetudoLogLevel = async (): Promise<LogLevelResponse> => {
 export const sendValetudoLogLevel = async (logLevel: SetLogLevelRequest): Promise<void> => {
     await valetudoAPI
         .put("/valetudo/log/level", logLevel)
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not set new log level");
             }
@@ -549,7 +550,7 @@ export const sendNTPClientConfiguration = async (configuration: NTPClientConfigu
 };
 
 export const fetchTimerInformation = async (): Promise<TimerInformation> => {
-    return valetudoAPI.get<TimerInformation>("/timers").then(({ data }) => {
+    return valetudoAPI.get<TimerInformation>("/timers").then(({data}) => {
         return data;
     });
 };
@@ -559,7 +560,7 @@ export const deleteTimer = async (id: string): Promise<void> => {
 };
 
 export const sendTimerCreation = async (timerData: Timer): Promise<void> => {
-    await valetudoAPI.post("/timers", timerData).then(({ status }) => {
+    await valetudoAPI.post("/timers", timerData).then(({status}) => {
         if (status !== 200) {
             throw new Error("Could not create timer");
         }
@@ -569,7 +570,7 @@ export const sendTimerCreation = async (timerData: Timer): Promise<void> => {
 export const sendTimerUpdate = async (timerData: Timer): Promise<void> => {
     await valetudoAPI
         .put(`/timers/${timerData.id}`, timerData)
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not update timer");
             }
@@ -579,7 +580,7 @@ export const sendTimerUpdate = async (timerData: Timer): Promise<void> => {
 export const fetchTimerProperties = async (): Promise<TimerProperties> => {
     return valetudoAPI
         .get<TimerProperties>("/timers/properties")
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -587,7 +588,7 @@ export const fetchTimerProperties = async (): Promise<TimerProperties> => {
 export const fetchValetudoEvents = async (): Promise<Array<ValetudoEvent>> => {
     return valetudoAPI
         .get<Array<ValetudoEvent>>("/events")
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -595,7 +596,7 @@ export const fetchValetudoEvents = async (): Promise<Array<ValetudoEvent>> => {
 export const sendValetudoEventInteraction = async (interaction: ValetudoEventInteractionContext): Promise<void> => {
     await valetudoAPI
         .put(`/events/${interaction.id}/interact`, interaction.interaction)
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not interact with event");
             }
@@ -605,7 +606,7 @@ export const sendValetudoEventInteraction = async (interaction: ValetudoEventInt
 export const fetchPersistentDataState = async (): Promise<SimpleToggleState> => {
     return valetudoAPI
         .get<SimpleToggleState>(`/robot/capabilities/${Capability.PersistentMapControl}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -615,7 +616,7 @@ const sendToggleMutation = async (capability: Capability, enable: boolean): Prom
         .put(`/robot/capabilities/${capability}`, {
             action: enable ? "enable" : "disable"
         })
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error(`Could not change ${capability} state`);
             }
@@ -631,7 +632,7 @@ export const sendMapReset = async (): Promise<void> => {
         .put(`/robot/capabilities/${Capability.MapReset}`, {
             action: "reset"
         })
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not reset the map");
             }
@@ -643,7 +644,7 @@ export const sendStartMappingPass = async (): Promise<void> => {
         .put(`/robot/capabilities/${Capability.MappingPass}`, {
             action: "start_mapping"
         })
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not start the mapping pass");
             }
@@ -653,7 +654,7 @@ export const sendStartMappingPass = async (): Promise<void> => {
 export const fetchSpeakerVolumeState = async (): Promise<SpeakerVolumeState> => {
     return valetudoAPI
         .get<SpeakerVolumeState>(`/robot/capabilities/${Capability.SpeakerVolumeControl}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -664,7 +665,7 @@ export const sendSpeakerVolume = async (volume: number): Promise<void> => {
             action: "set_volume",
             value: volume,
         })
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not change speaker volume");
             }
@@ -674,7 +675,7 @@ export const sendSpeakerVolume = async (volume: number): Promise<void> => {
 export const fetchVoicePackManagementState = async (): Promise<VoicePackManagementStatus> => {
     return valetudoAPI
         .get<VoicePackManagementStatus>(`/robot/capabilities/${Capability.VoicePackManagement}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -698,7 +699,7 @@ export const sendSpeakerTestCommand = async (): Promise<void> => {
 export const fetchKeyLockState = async (): Promise<SimpleToggleState> => {
     return valetudoAPI
         .get<SimpleToggleState>(`/robot/capabilities/${Capability.KeyLock}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -710,7 +711,7 @@ export const sendKeyLockEnable = async (enable: boolean): Promise<void> => {
 export const fetchCarpetModeState = async (): Promise<SimpleToggleState> => {
     return valetudoAPI
         .get<SimpleToggleState>(`/robot/capabilities/${Capability.CarpetModeControl}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -722,7 +723,7 @@ export const sendCarpetModeEnable = async (enable: boolean): Promise<void> => {
 export const fetchAutoEmptyDockAutoEmptyControlState = async (): Promise<SimpleToggleState> => {
     return valetudoAPI
         .get<SimpleToggleState>(`/robot/capabilities/${Capability.AutoEmptyDockAutoEmptyControl}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -734,7 +735,7 @@ export const sendAutoEmptyDockAutoEmptyControlEnable = async (enable: boolean): 
 export const fetchDoNotDisturbConfiguration = async (): Promise<DoNotDisturbConfiguration> => {
     return valetudoAPI
         .get<DoNotDisturbConfiguration>(`/robot/capabilities/${Capability.DoNotDisturb}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -742,7 +743,7 @@ export const fetchDoNotDisturbConfiguration = async (): Promise<DoNotDisturbConf
 export const sendDoNotDisturbConfiguration = async (configuration: DoNotDisturbConfiguration): Promise<void> => {
     await valetudoAPI
         .put(`/robot/capabilities/${Capability.DoNotDisturb}`, configuration)
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not update DND configuration");
             }
@@ -752,7 +753,7 @@ export const sendDoNotDisturbConfiguration = async (configuration: DoNotDisturbC
 export const fetchWifiStatus = async (): Promise<WifiStatus> => {
     return valetudoAPI
         .get<WifiStatus>(`/robot/capabilities/${Capability.WifiConfiguration}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -760,7 +761,7 @@ export const fetchWifiStatus = async (): Promise<WifiStatus> => {
 export const fetchWifiConfigurationProperties = async (): Promise<WifiConfigurationProperties> => {
     return valetudoAPI
         .get<WifiConfigurationProperties>(`/robot/capabilities/${Capability.WifiConfiguration}/properties`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -783,7 +784,7 @@ export const sendWifiConfiguration = async (configuration: WifiConfiguration): P
             encryption: "rsa",
             payload: encryptedPayload
         })
-        .then(({ status }) => {
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not set Wifi configuration");
             }
@@ -793,7 +794,7 @@ export const sendWifiConfiguration = async (configuration: WifiConfiguration): P
 export const fetchWifiProvisioningEncryptionKey = async (): Promise<WifiProvisioningEncryptionKey> => {
     return valetudoAPI
         .get<WifiProvisioningEncryptionKey>(`/robot/capabilities/${Capability.WifiConfiguration}/getPublicKeyForProvisioning`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -801,7 +802,7 @@ export const fetchWifiProvisioningEncryptionKey = async (): Promise<WifiProvisio
 export const fetchWifiScan = async (): Promise<Array<ValetudoWifiNetwork>> => {
     return valetudoAPI
         .get<Array<ValetudoWifiNetwork>>(`/robot/capabilities/${Capability.WifiScan}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -809,7 +810,7 @@ export const fetchWifiScan = async (): Promise<Array<ValetudoWifiNetwork>> => {
 export const fetchManualControlState = async (): Promise<SimpleToggleState> => {
     return valetudoAPI
         .get<SimpleToggleState>(`/robot/capabilities/${Capability.ManualControl}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -817,7 +818,7 @@ export const fetchManualControlState = async (): Promise<SimpleToggleState> => {
 export const fetchManualControlProperties = async (): Promise<ManualControlProperties> => {
     return valetudoAPI
         .get<ManualControlProperties>(`/robot/capabilities/${Capability.ManualControl}/properties`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -825,7 +826,17 @@ export const fetchManualControlProperties = async (): Promise<ManualControlPrope
 export const sendManualControlInteraction = async (interaction: ManualControlInteraction): Promise<void> => {
     await valetudoAPI
         .put(`/robot/capabilities/${Capability.ManualControl}`, interaction)
-        .then(({ status }) => {
+        .then(({status}) => {
+            if (status !== 200) {
+                throw new Error("Could not send manual control interaction");
+            }
+        });
+};
+
+export const sendManualVectorControlInteraction = async (interaction: ManualVectorControlInteraction): Promise<void> => {
+    await valetudoAPI
+        .put(`/robot/capabilities/${Capability.ManualVectorControl}`, interaction)
+        .then(({status}) => {
             if (status !== 200) {
                 throw new Error("Could not send manual control interaction");
             }
@@ -873,7 +884,7 @@ export const sendUpdaterCommand = async (
 export const fetchCurrentStatistics = async (): Promise<Array<ValetudoDataPoint>> => {
     return valetudoAPI
         .get<Array<ValetudoDataPoint>>(`/robot/capabilities/${Capability.CurrentStatistics}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -881,7 +892,7 @@ export const fetchCurrentStatistics = async (): Promise<Array<ValetudoDataPoint>
 export const fetchCurrentStatisticsProperties = async (): Promise<StatisticsProperties> => {
     return valetudoAPI
         .get<StatisticsProperties>(`/robot/capabilities/${Capability.CurrentStatistics}/properties`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -889,7 +900,7 @@ export const fetchCurrentStatisticsProperties = async (): Promise<StatisticsProp
 export const fetchTotalStatistics = async (): Promise<Array<ValetudoDataPoint>> => {
     return valetudoAPI
         .get<Array<ValetudoDataPoint>>(`/robot/capabilities/${Capability.TotalStatistics}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -897,7 +908,7 @@ export const fetchTotalStatistics = async (): Promise<Array<ValetudoDataPoint>> 
 export const fetchTotalStatisticsProperties = async (): Promise<StatisticsProperties> => {
     return valetudoAPI
         .get<StatisticsProperties>(`/robot/capabilities/${Capability.TotalStatistics}/properties`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -905,7 +916,7 @@ export const fetchTotalStatisticsProperties = async (): Promise<StatisticsProper
 export const fetchQuirks = async (): Promise<Array<Quirk>> => {
     return valetudoAPI
         .get<Array<Quirk>>(`/robot/capabilities/${Capability.Quirks}`)
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };
@@ -923,7 +934,7 @@ export const sendSetQuirkValueCommand = async (command: SetQuirkValueCommand): P
 export const fetchRobotProperties = async (): Promise<RobotProperties> => {
     return valetudoAPI
         .get<RobotProperties>("/robot/properties")
-        .then(({ data }) => {
+        .then(({data}) => {
             return data;
         });
 };

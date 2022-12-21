@@ -99,6 +99,7 @@ import {
     fetchWifiConfigurationProperties,
     fetchWifiScan,
     sendDismissWelcomeDialogAction,
+    sendManualVectorControlInteraction,
 } from "./client";
 import {
     PresetSelectionState,
@@ -114,6 +115,7 @@ import {
     DoNotDisturbConfiguration,
     HTTPBasicAuthConfiguration,
     ManualControlInteraction,
+    ManualVectorControlInteraction,
     MapSegmentationActionRequestParameters,
     MapSegmentEditJoinRequestParameters,
     MapSegmentEditSplitRequestParameters,
@@ -998,6 +1000,16 @@ export const useManualControlInteraction = () => {
         CacheKey.ManualControl,
         (interaction: ManualControlInteraction) => {
             return sendManualControlInteraction(interaction).then(fetchManualControlState);
+        }
+    );
+};
+
+export const useManualVectorControlInteraction = () => {
+    return useValetudoFetchingMutation(
+        useOnCommandError(Capability.ManualControl),
+        CacheKey.ManualControl,
+        (interaction: ManualVectorControlInteraction) => {
+            return sendManualVectorControlInteraction(interaction).then(fetchManualControlState);
         }
     );
 };

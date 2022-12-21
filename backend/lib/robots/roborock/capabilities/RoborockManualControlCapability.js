@@ -92,6 +92,24 @@ class RoborockManualControlCapability extends ManualControlCapability {
             seqnum: ++this.sequenceId
         }], {});
     }
+
+    /**
+     * used for gamepad input
+     * @abstract
+     * @param {number} x
+     * @param {number} y
+     * @returns {Promise<void>}
+     */
+    async manualVectorControl(x,y) {
+        let angle = (60*(Math.PI / 180)) * x;
+        let velocity = y * 0.29; // same number as above
+
+        return this.robot.sendCommand("app_rc_move", [{
+            omega: angle,
+            velocity: velocity,
+            seqnum: ++this.sequenceId
+        }], {});
+    }
 }
 
 module.exports = RoborockManualControlCapability;

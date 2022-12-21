@@ -53,6 +53,17 @@ class ManualControlCapability extends Capability {
         throw new NotImplementedError();
     }
 
+    /**
+     * provide a 2d vector from a gamepad joystick or dpad
+     * @abstract
+     * @param {number} x
+     * @param {number} y
+     * @returns {Promise<void>}
+     */
+    async manualVectorControl(x,y) {
+        throw new NotImplementedError();
+    }
+
     getProperties() {
         return {
             supportedMovementCommands: this.supportedMovementCommands
